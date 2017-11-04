@@ -167,15 +167,9 @@ Initially an older version of Node is installed on the server, let's go ahead an
 
 `apt-get update && apt-get dist-upgrade`  This updates the linux list of software it knows about
 
-`apt-get install nodejs` This will install nodejs (v4 of node)
+`apt-get install nodejs -y;apt-get install npm -y;` This will install nodejs (v4 of node) and npm
 
-`apt-get install npm` This will install npm (the unix version doesn't bundle npm with the default node install)
-
-`npm i -g n` This installs a program called n that we can use to update node
-
-`n latest ` Install the latest version of node (We can also install a specific version by n 7.5.1)
-
-`npm i -g npm` Install the latest version of npm
+`npm i -g n;n stable;npm i -g npm;` Update and install the latest stable version of node
 
 
 ## Swap
