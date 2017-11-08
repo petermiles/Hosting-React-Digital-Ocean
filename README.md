@@ -169,7 +169,11 @@ Initially an older version of Node is installed on the server, let's go ahead an
 
 `apt-get install nodejs -y;apt-get install npm -y;` This will install nodejs (v4 of node) and npm
 
-`npm i -g n;n stable;npm i -g npm;` Update and install the latest stable version of node
+`npm i -g n;` 
+
+`n ;`  Go to your local terminal and find what version of node you are working with. `node -v` Use that same version
+
+`npm i -g npm;` Update and install the latest stable version of node
 
 
 ## Swap
