@@ -1,8 +1,8 @@
 ## Deploying a Single Page React App On Digital Ocean
 
-## Sign up for Digital Ocean
+## Turn off React's default Web Service Worker
 
-We are using Digital Ocean as our hosting platform.  We have $100 dollar promo codes that you can use for hosting.  The small droplets are $5 a month, so you can have over a year of hosting.  In order to use Digital Ocean, you need either a credit card on file, or you can do payment upfront with PayPal of $5.  Get with a member of the instructional staff if you need a digital ocean promo code.  
+  Create React App's built in web service worker creates some problems when you try to server you API and your local files from the same server.  If you haven't already, remove the default web service worker from your `src/index.js` file.  *Delete* the lines that say `registerServiceWorker();` and `import registerServiceWorker from 'register-service-worker'`
 
 ### Make sure your server is setup to run off the build process
 
@@ -14,18 +14,18 @@ Tell create-react-app to use webpack to create a build folder with your latest c
 
 `npm run build`
 
+Make sure your express.static is pointing to the build folder.
+
+```
+app.use( express.static( `${__dirname}/../build` ) );
+```
+
 Make sure your dev server isn't running for the front end.  Start your backend server
 
 `nodemon`
 
 In your browser, check that you can go to http://localhost:3030 (or whichever port you told your backend to run on.) And make sure that you are sending the files to the front end.
 
-
-Make sure your express.static is pointing to the build folder.
-
-```
-app.use( express.static( `${__dirname}/../build` ) );
-```
 
 If you are using browser history, you'll need this to make sure your index.html file is being given on the other routes.
 
@@ -54,6 +54,7 @@ Example .env file
 ```
 REACT_APP_LOGIN="http://localhost:3030/api/auth/login"
 REACT_APP_LOGOUT="http://localhost:3030/api/auth/logout"
+REACT_APP_BASEURL="http://localhost:3030"
 
 DOMAIN="brack.auth0.com"
 ID="46NxlCzM0XDE7T2upOn2jlgvoS"
@@ -85,14 +86,11 @@ Double check that your server is still working with this new configuration setti
 
   This tutorial is for setting up small personal sites on Digital Ocean, it does not cover the myriad of topics that will be important to long term system management.  But if you're wanting to host personal projects, or portfolio pieces it will help get you started.
 
-## Turn off React's default Web Service Worker
 
-  Create React App's built in web service worker creates some problems when you try to server you API and your local files at the same time.  If you haven't already, remove the default web service worker from your  
-  From your src/index.js file.  Delete or comment out the line that says `registerServiceWorker();`
 
-### Register for Digital Ocean
+### Sign up for Digital Ocean
 
-  If you've not already created a Digital Ocean Account, you can sign up through [this](https://m.do.co/c/8ea79fee4894) link to get $10 free.
+  We are using Digital Ocean as our hosting platform.  We have $100 dollar promo codes that you can use for hosting.  The small droplets are $5 a month, so you can have over a year of hosting.  In order to use Digital Ocean, you need either a credit card on file, or you can do payment upfront with PayPal of $5.  Get with a member of the instructional staff if you need a digital ocean promo code.  
 
 ### Create SSH Keys
 
@@ -171,15 +169,13 @@ Initially an older version of Node is installed on the server, let's go ahead an
 
 `apt-get update && apt-get dist-upgrade`  This updates the linux list of software it knows about
 
-`apt-get install nodejs` This will install nodejs (v4 of node)
+`apt-get install nodejs -y;apt-get install npm -y;` This will install nodejs (v4 of node) and npm
 
-`apt-get install npm` This will install npm (the unix version doesn't bundle npm with the default node install)
+`npm i -g n;`
 
-`npm i -g n` This installs a program called n that we can use to update node
+`n ;`  Go to your local terminal and find what version of node you are working with. `node -v` Use that same version
 
-`n latest ` Install the latest version of node (We can also install a specific version by n 7.5.1)
-
-`npm i -g npm` Install the latest version of npm
+`npm i -g npm;` Update and install the latest stable version of node
 
 
 ## Swap
