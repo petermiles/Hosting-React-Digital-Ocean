@@ -1,5 +1,9 @@
 ## Deploying a Single Page React App On Digital Ocean
 
+## Turn off React's default Web Service Worker
+
+  Create React App's built in web service worker creates some problems when you try to server you API and your local files from the same server.  If you haven't already, remove the default web service worker from your `src/index.js` file.  *Delete* the lines that say `registerServiceWorker();` and `import registerServiceWorker from 'register-service-worker'`
+
 ### Make sure your server is setup to run off the build process
 
 Before we want to deploy our project, we should make sure that our project is working on our local machine.  If it's not working, open you dev console, look at your terminal output.  And try to figure out what is causing it to break locally.
@@ -10,18 +14,18 @@ Tell create-react-app to use webpack to create a build folder with your latest c
 
 `npm run build`
 
+Make sure your express.static is pointing to the build folder.
+
+```
+app.use( express.static( `${__dirname}/../build` ) );
+```
+
 Make sure your dev server isn't running for the front end.  Start your backend server
 
 `nodemon`
 
 In your browser, check that you can go to http://localhost:3030 (or whichever port you told your backend to run on.) And make sure that you are sending the files to the front end.
 
-
-Make sure your express.static is pointing to the build folder.
-
-```
-app.use( express.static( `${__dirname}/../build` ) );
-```
 
 If you are using browser history, you'll need this to make sure your index.html file is being given on the other routes.
 
@@ -50,6 +54,7 @@ Example .env file
 ```
 REACT_APP_LOGIN="http://localhost:3030/api/auth/login"
 REACT_APP_LOGOUT="http://localhost:3030/api/auth/logout"
+REACT_APP_BASEURL="http://localhost:3030"
 
 DOMAIN="brack.auth0.com"
 ID="46NxlCzM0XDE7T2upOn2jlgvoS"
@@ -81,10 +86,7 @@ Double check that your server is still working with this new configuration setti
 
   This tutorial is for setting up small personal sites on Digital Ocean, it does not cover the myriad of topics that will be important to long term system management.  But if you're wanting to host personal projects, or portfolio pieces it will help get you started.
 
-## Turn off React's default Web Service Worker
 
-  Create React App's built in web service worker creates some problems when you try to server you API and your local files at the same time.  If you haven't already, remove the default web service worker from your  
-  From your src/index.js file.  Delete or comment out the line that says `registerServiceWorker();`
 
 ### Register for Digital Ocean
 
