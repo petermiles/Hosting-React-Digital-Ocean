@@ -1,5 +1,9 @@
 ## Deploying a Single Page React App On Digital Ocean
 
+## Sign up for Digital Ocean
+
+We are using Digital Ocean as our hosting platform.  We have $100 dollar promo codes that you can use for hosting.  The small droplets are $5 a month, so you can have over a year of hosting.  In order to use Digital Ocean, you need either a credit card on file, or you can do payment upfront with PayPal of $5.  Get with a member of the instructional staff if you need a digital ocean promo code.  
+
 ### Make sure your server is setup to run off the build process
 
 Before we want to deploy our project, we should make sure that our project is working on our local machine.  If it's not working, open you dev console, look at your terminal output.  And try to figure out what is causing it to break locally.
