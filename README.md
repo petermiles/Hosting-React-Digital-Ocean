@@ -437,6 +437,7 @@ Host brack
     Port 22
     RemoteForward 52698 localhost:52698
     User root
+    IdentityFile ~/.ssh/id_rsa
 ```
 
 After creating this you can just run ```ssh brack``` in place of ```ssh root@brackcarmony.com```
