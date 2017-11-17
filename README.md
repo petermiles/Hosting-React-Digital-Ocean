@@ -1,35 +1,30 @@
-## Deploying a Single Page React App On Digital Ocean
+# Hosting a React Project on Digital Ocean
 
-## Turn off React's default Web Service Worker
+  This tutorial is for setting up small personal sites on Digital Ocean, it does not cover the myriad of topics that will be important to long term system management.  But if you're wanting to host personal projects, or portfolio pieces it will get you started.
 
-  Create React App's built in web service worker creates some problems when you try to server you API and your local files from the same server.  If you haven't already, remove the default web service worker from your `src/index.js` file.  *Delete* the lines that say `registerServiceWorker();` and `import registerServiceWorker from 'register-service-worker'`
+# Prepping your App to host
 
-### Make sure your server is setup to run off the build process
+We will do some things to help prep your app to be hosted.
+
+## Turn off Create React App's Service Worker
+
+Create React App's built in web service worker creates some problems when you try to server you API and your local files from the same server.  If you haven't already, remove the default web service worker from your `src/index.js` file.  *Delete* the lines that say `registerServiceWorker();` and `import registerServiceWorker from 'register-service-worker'`
+
+### Make sure your server is serving your React App
 
 Before we want to deploy our project, we should make sure that our project is working on our local machine.  If it's not working, open you dev console, look at your terminal output.  And try to figure out what is causing it to break locally.
 
 Up till now we have been using the React Dev Server to serve our react app.  We are going to update this so that it will use a production build of our project.  This will do things such as removing extra white-space, comments, and minify our code so that it's as fast to download as possible.  
 
-Tell create-react-app to use webpack to create a build folder with your latest code.
-
-`npm run build`
-
-Make sure your express.static is pointing to the build folder.
+Make sure your express.static is pointing to the build folder.  This should be our first middleware.
 
 ```
 app.use( express.static( `${__dirname}/../build` ) );
 ```
 
-Make sure your dev server isn't running for the front end.  Start your backend server
-
-`nodemon`
-
-In your browser, check that you can go to http://localhost:3030 (or whichever port you told your backend to run on.) And make sure that you are sending the files to the front end.
-
-
 If you are using browser history, you'll need this to make sure your index.html file is being given on the other routes.
 
-Towards the *end* of your server file make sure you have this (this needs to run after you've setup all your other endpoints)
+As the LAST endpoint (this needs to run after you've setup all your other endpoints)
 
 ```
 const path = require('path')
@@ -37,24 +32,47 @@ app.get('*', (req, res)=>{
   res.sendFile(path.join(__dirname, '../build/index.html'));
 })
 ```
-Check that your project is working.
 
-If it is not.  Check your DevTools console, as well as the server terminal output to figure out what is going wrong.  
+Tell create-react-app to use webpack to create a build folder with your latest code.
+
+`npm run build`
+
+`nodemon`
+
+In your browser, go to http://localhost:3030 (or whichever port your backend runs) And make sure that your server is sending the files to the front end.
 
 ## Ensure you've setup a .env file, and set node to use it for your project.
 
+*Make sure the .gitignore contains the .env file*
+
 All the configuration that you need different between deployed and local should go into this file.  As well as any keys that you want to be secret.  
 
-The connection string to your database, the REACT_APP_ reference for Auth0, as well as your Auth0 credentials should be in here.  You may have additional variables set here if you want to make other changes between a local and production build.  
+*Make sure the .gitignore contains the .env file*
 
-*Make sure the .gitignore contains the .env and files*
+Settings that may need to be different between local and production
+Login and Logout links on <a> tags.  We cannot proxy <a> tags, so we have to hard code in the backend address when using the react dev server.  But on our hosted version, we will *not* want to point to localhost.  That will point to your users computer.  So we want to use relative paths in production.
+
+Settings that need to be in a .env to be secret
+
+*Make sure the .gitignore contains the .env file*
+
+* Connection String.  Anyone who has access to your Connection String has access to read and write whatever they want in your database.  So we need to keep that secret.
+
+* API Keys - Any API that charges, or has the potential to charge you money you will want to keep hidden.  If someone gets your AWS key they can run up charges on your account to the tune of $5000 a day.  Amazon is generally really good about helping people who have this happen to them, however, that's going to be 10-15 hours on the phone with the help desk.  Not fun and a terrible experience for you.  Keep you Keys hidden.
+
+
+
+
+*Make sure the .gitignore contains the .env file*
+*Make sure the .gitignore contains the .env file*
+*Make sure the .gitignore contains the .env file*
+*Make sure the .gitignore contains the .env file*
 
 Example .env file
 
 ```
 REACT_APP_LOGIN="http://localhost:3030/api/auth/login"
 REACT_APP_LOGOUT="http://localhost:3030/api/auth/logout"
-REACT_APP_BASEURL="http://localhost:3030"
 
 DOMAIN="brack.auth0.com"
 ID="46NxlCzM0XDE7T2upOn2jlgvoS"
@@ -66,41 +84,44 @@ CONNECTION_STRING="postgres://vuigx:k8Io23cePdUorndJAB2ijk_u0r4@stampy.db.elepha
 NODE_ENV=development
 ```
 
+If you did not have this already in your project, you will need to install dotenv.
+
+`npm i dotenv`
+
 Then we are going to check out main server file.
 It should contain the following at the beginning of your code (It can go anywhere before you first try to use the process.env variables, but the first line makes sure that it is always available to you);
 
 `require('dotenv').config();`
 
-If you did not have this already in your project, you will need to install dotenv.
-
-`npm i dotenv`
-
 Double check that your server is still working with this new configuration setting.
 
-
-
 # Setup with Digital Ocean
-
-
-## Hosting your node projects on Digital Ocean.
-
-  This tutorial is for setting up small personal sites on Digital Ocean, it does not cover the myriad of topics that will be important to long term system management.  But if you're wanting to host personal projects, or portfolio pieces it will help get you started.
-
-
 
 ### Sign up for Digital Ocean
 
   We are using Digital Ocean as our hosting platform.  We have $100 dollar promo codes that you can use for hosting.  The small droplets are $5 a month, so you can have over a year of hosting.  In order to use Digital Ocean, you need either a credit card on file, or you can do payment upfront with PayPal of $5.  Get with a member of the instructional staff if you need a digital ocean promo code.  
 
+### What is a droplet?
+
+A Droplet is digital ocean's cute name for their servers.  A server is a computer that has a public IP address.  An IP address is a set of 4 numbers between 0-255 connected with . IE 124.21.26.122 Anyone who knows this IP address can make a request to a server.  
+
+### Managing our droplet
+
+This droplet is publicly available.  Meaning we are going to want some way to tell the server that we are trying to interact with it, vs all the other people on the internet who may have the IP address.  We *could* try and make a username and password that noone on the internet is going to guess.  But this computer could have a potential hacker try thousands of passwords a minute.  Any password that is going to be good enough to secure your droplet, is going to be a huge pain to memorize and keep secret.   Instead we are going to use SSH keys to create a secure way of us talking with our droplet.
+
 ### Create SSH Keys
 
-To connect to our server we will use SSH keys.  It will make working with your server much easier.
+To create a key we can run the following (in windows must use git-bash)
 
   ```ssh-keygen -t rsa```
 
-This will start a process to step you through the key generation process.  The default location and filename are best for your first key.
+This will start a process to step you through the key generation process.  
 
-Take note that after asking for the file, it will ask for a passphrase.  There is no way to recover this passphrase.  So make it something that you will remember.  
+First it will ask where you want to save this file.  Use the default unless you already have an SSH key that you need to keep.
+
+Second it will ask you for a passphrase.  This will act as a second layer of security.  In case someone gets ahold of your key, usually by getting ahold of your computer.  Note: It will not show you anything when you type, but it is keeping track of what you save.
+
+Third it will ask you to reenter the same passphrase to make sure you entered the correct one.
 
   ```sh
 Generating public/private rsa key pair.
@@ -143,7 +164,7 @@ Copy the whole thing either from the output, opening the file and copying it, or
 
 ### Adding your SSH Key to Digital Ocean
 
-You'll need to go to your [Securit Settings.](https://cloud.digitalocean.com/settings/security)
+You'll need to go to your [Security Settings.](https://cloud.digitalocean.com/settings/security)
 
 Click on Add SSH key, paste your **public** SSH key into the box.  You can give the key a name to remember which key it is.  I usually recommend a combination of your name, and which computer the key is on.  So something like Brack Macbook.  
 
@@ -151,17 +172,25 @@ Click on Add SSH key, paste your **public** SSH key into the box.  You can give 
 
 Now we can spin up a [droplet.](https://cloud.digitalocean.com/droplets)  Click Create Droplet.  Here we can choose what OS we want our server to be, as well as choose some default software to install.  
 
-Unless you have a reason not to, I suggest Ubuntu for the operation system.  None of the images come with postgres installed, so we can just go with the blank build.
+Select the latest Ubuntu for you server (default)
 
-Select your droplet size $5.  Select a data center, probably San Francisco or New York. You can select additional services, though some of these cost extra.  Make sure to select the SSH key you registered earlier. Name your droplet, it doesn't really matter what you call it, but you can put multiple projects on a single droplet, so you may not want it to be named after any specific project.
+Select your droplet size.  The smallest droplet should be more than enough for your project.  
+
+Select a data center, probably San Francisco or New York.  The numbers won't matter to much for you.  They roll out new features into different zones at different times, but we're not using any of Digital Ocean's special new features.
+
+You can select additional services such as auto backups. But they cost an extra amount.
+
+Make sure your SSH key is selected.
+
+Name your droplet, you can put multiple projects on a single droplet, so you may not want it to be named after any specific project.
 
 ### Connect to your Server
 
-After your droplet has spun up, you'll know your ip address.  We'll connect to the droplet through the ssh (Secure SHell) command
+After your droplet has spun up, it will give you it's IP address.  We'll connect to the droplet through the ssh (Secure SHell) command
 
 ```ssh root@222.222.222.222```
 
-root is the user that you will connect as.  You  an optionally set up [different users](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-14-04) with their own ssh keys in case you want others to share the server, or connecting to a system as the root user all the time makes you queasy.   
+root is the user that you will connect as.  You can optionally set up [different users](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-14-04) if connecting to a system as the root user all the time makes you queasy.   
 
 ### Install Node
 
@@ -241,17 +270,15 @@ You should now be able to go to ipaddrress:port in your browser to see your proj
 
 If your server is running on port 80, you can drop specifying the port number.  
 
-### Install forever
+### Install pm2
 
-Terminate your node server if it's still running.   We're going to install a forever, a program that will keep your server running after you log out of the server, and will auto restart the server if it crashes.  (unless it's crashing too quickly.)  
+Terminate your node server if it's still running.   We're going to install pm2 (Program Manager 2) a program that will keep your server running after you log out of the server, and will auto restart the server if it crashes.
 
-We can also set up the forever list to show the folder the script was ran from.  Useful if you have several projects running on one droplet.
-
-Then we will start the process running.
+Then we will tell pm2 to start our server file.
 
 ```sh
-npm install -g forever
-forever start server/server.js
+npm install -g pm2
+pm2 start server/server.js
 ```
 
 When you have changes that you want to bring into the project.  Make sure that you've pushed to to github.  Then from your server.  The exact process you do may change a bit depending on how you've set up your project.
@@ -260,34 +287,33 @@ When you have changes that you want to bring into the project.  Make sure that y
 
 ```npm build``` (react changes) In case you have a build process that needs to recompile those changes on the server
 
-```forever restartall``` (server changes) Restart the server to bring in the new server changes
+```pm2 restart all``` (server changes) Restart the server to bring in the new server changes
 
 ### Useful Forever Commands
 
-To see the currently running processes: ```forever list```
+To see the currently running processes: ```pm2 list```
 
-To restart all forever processes: ```forever restartall```
+To restart all forever processes: ```pm2 restart all```
 
-To restart a specific process: ```forever restart X``` where X is a pid, uid, or process index.
+To restart a specific process: ```pm2 restart X``` where X is a name or process index.
 
-To Stop all forever processes:```forever stopall```
+To Stop all forever processes:```pm2 stop all```
 
-If you want to format the forever list output. I recommend the following changes to add the directory the script was ran from, and removing the command, as it should be node that is running the process.
-
-```
-forever columns rm command
-forever columns add dir
-```
-
-### Postgres and you
+### Postgres
 
 For your projects you have a few options.  You can install Postgres on your server.  Then your project will look at the local machine for it's database the same way that it does when running on your local machine.  The downside to this is if you like working with tools like pgAdmin, it can be difficult to get configured correctly.
 
-Or you can go with a DB as a service such as [ElephantSQL](https://www.elephantsql.com/). ElephantSQL has a free tier with 20MB disk space.  Not a ton, but for small project not needing to worry about it's set up may be worth it.
+Or you can go with a DB as a service such as [Heroku Postgres](https://www.heroku.com/postgres) or [ElephantSQL](https://www.elephantsql.com/). ElephantSQL has a free tier with 20MB disk space.  Not a ton, but for small project not needing to worry about it's set up may be worth it.
 
 ### Setting Up Domains
 
-Unless you have lots of friends that enjoy accessing websites by ip (You know they exist) You'll want to route your domain to point at your server.  This is slightly different for each register.  Or you can tell the reigstrar to let Digital Ocean manage your routes.  [Here](https://github.com/zacanger/doc/blob/master/digital-ocean.md#domains) is a short description of how to set up Domain records.  
+Unless you have lots of friends that enjoy accessing websites by ip (You know they exist) You'll want to route your domain to point at your server.  This is slightly different for each register.  Or you can tell the reigstrar to let Digital Ocean manage your routes.  [Here](https://github.com/zacanger/doc/blob/master/digital-ocean.md#domains) is a short description of how to set up Domain records.
+
+[Google Domains](https://support.google.com/domains/answer/3290350?hl=en)
+
+[Name Cheap](https://www.namecheap.com/support/knowledgebase/article.aspx/319/2237/how-can-i-set-up-an-a-address-record-for-my-domain)
+
+[Go Daddy](https://www.godaddy.com/help/add-an-a-record-19238)
 
 ### NGINX - Optional
 
@@ -311,7 +337,7 @@ We can set up each individual servers by editing the default file in this folder
 
 This example sets up 3 different servers listening for different domains/subdomains.
 
-They should all listen to port 80, that's the default for web-traffic. The server_name should be changed for each server, this is the domain that you want associated with each server.  Also the proxy_pass needs to be changed to match the port each is running on.
+They all listen to port 80, that's the default port for web-traffic. The server_name should be changed for each server, this is the domain that you want associated with each server.  Also the proxy_pass needs to be changed to match the port each is running on.
 ```
 # Basic server block setup
 
@@ -393,7 +419,7 @@ We are going to name all the servers we want to keep track of, along with the cr
 
 ```
 Host <nickname> // This will be our nickname for the server
-    HostName <myServer.com> // Either the IP adress or domain name that you want to connect to
+    HostName <myServer.com> // Either the IP address or domain name that you want to connect to
     Port 22 // This is 22 by default for SSH connections
     RemoteForward 52698 localhost:52698 // This is if you want to use the rmate or ratom packages
     User username // either root or one of the users you created on the server to run things
