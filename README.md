@@ -225,7 +225,7 @@ swapon /swapfile
 
 * The swapfile will only be in use till the droplet restarts.
 * You can turn off the swapfile by using ```swapoff /swapfile``` After you run your grunt gulp or webpack commands
-* If you want to make it so the dorplet loads with the swapfile one
+* If you want to make it so the droplet loads with the swapfile one
 * `nano /etc/fstab`. add the following to the bottom:
   `/swapfile   none    swap    sw    0   0`
 * We can also tell the server to use the swap file less frequently by lowering the swapiness
@@ -260,7 +260,7 @@ If you wave a different build process, run that (such as grunt gulp or webpack i
 Now run node to check for any server load errors (in case you forgot to --save all your dependencies.)
 
 ```
-node server/server.js
+node server/index.js
 ```
 
 If you get any errors, npm install those packages, and repeat till the server runs.  
